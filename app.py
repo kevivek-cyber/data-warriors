@@ -35,28 +35,30 @@ def admin_file(give_list):
     
     admin_df = pd.DataFrame({'required_skills':[give_list]})
     admin_df.to_csv(admin_path, index=False)
+
+# Try to load data, but don't crash if it fails
+try:
+    show_df = pd.read_csv("users.csv")
+    soham_df3 = pd.read_csv('admin.csv')
+
+    show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
+    show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
+    show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
+    show_df['matches'] = show_df['Aquired Skill'].apply(
+        lambda x: int(any(skill in soham_df3['required_skills'].values for skill in x))
+    )
+    show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
+    fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
+    print(show_df)
+
+    show_df.columns = show_df.columns.str.strip()
+    show_df['Name'] = show_df['Name'].str.strip()
+except Exception as e:
+    print(f"Warning: Could not load CSV files: {e}")
+    show_df = pd.DataFrame(columns=['Name','Passing Year','Aquired Skill','Enter Collage','Year of Experience','Quiz Score','Score','matches','Performance'])
+    soham_df3 = pd.DataFrame(columns=['required_skills'])
+    fig = px.bar(show_df, x="Name", y='Performance', title="Candidate Dash")
     
-show_df = pd.read_csv("users.csv")
-soham_df3 = pd.read_csv('admin.csv')
-
-show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
-show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
-show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
-show_df['matches'] = show_df['Aquired Skill'].apply(
-    lambda x: int(any(skill in soham_df3['required_skills'].values for skill in x))
-)
-show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
-fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
-print(show_df)
-
-
-
-
-
-show_df.columns = show_df.columns.str.strip()
-
-
-show_df['Name'] = show_df['Name'].str.strip()
 
 
 
@@ -493,6 +495,3 @@ def submit_quiz(n, quiz_data, candidate):
     df.to_csv(file_path, index=False)
 
     return f"Quiz submitted. Score: {score}/{len(questions)}"
-
-if __name__ == "__main__":
-    server.run(debug=False, host="0.0.0.0", port=8050)
