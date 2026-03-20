@@ -16,7 +16,7 @@ admin_path = "admin.csv"
 
 def quiz_pie_chart(score):
     fig = go.Figure(go.Pie(
-        values=[score, 3-score],  # score vs remaining
+        values=[score, 3-score],
         labels=['Scored', 'Remaining'],
         hole=0.6,
         marker_colors=['#00cc96', '#e9ecef'],
@@ -36,7 +36,6 @@ def admin_file(give_list):
     admin_df = pd.DataFrame({'required_skills':[give_list]})
     admin_df.to_csv(admin_path, index=False)
 
-# Try to load data, but don't crash if it fails
 try:
     show_df = pd.read_csv("users.csv")
     soham_df3 = pd.read_csv('admin.csv')
@@ -49,21 +48,13 @@ try:
     )
     show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
     fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
-    print(show_df)
 
     show_df.columns = show_df.columns.str.strip()
     show_df['Name'] = show_df['Name'].str.strip()
 except Exception as e:
-    print(f"Warning: Could not load CSV files: {e}")
     show_df = pd.DataFrame(columns=['Name','Passing Year','Aquired Skill','Enter Collage','Year of Experience','Quiz Score','Score','matches','Performance'])
     soham_df3 = pd.DataFrame(columns=['required_skills'])
     fig = px.bar(show_df, x="Name", y='Performance', title="Candidate Dash")
-    
-
-
-
-
-    
 
 questions = [
     {
@@ -96,16 +87,11 @@ def generate_questions():
             )
         ]) for q in questions
     ]
-    
-
 
 fig.update_layout(
-    paper_bgcolor="#e6e9be",  # transparent figure background '#686a2a
-    plot_bgcolor="#e6e9be"    # transparent plot area
-    
+    paper_bgcolor="#e6e9be",
+    plot_bgcolor="#e6e9be"
 )
-
-
 
 app.layout = html.Div([
     
@@ -193,9 +179,7 @@ app.layout = html.Div([
         ]
     ),
     html.Div([
-        html.H2("Admin Section",style={'color':'#D5D55C',
-                                       'margin_top':'1px',
-        'padding':'0px'}),
+        html.H2("Admin Section", style={'color':'#D5D55C', 'margin_top':'1px', 'padding':'0px'}),
         dcc.Dropdown(
                 placeholder="Required Skill",
                 id='skills_req',
@@ -241,29 +225,16 @@ app.layout = html.Div([
                 'background-color': '#686a2a'
             }
         ),
-        dcc.Graph(
-        figure=fig,
-        
-        
-    ),
+        dcc.Graph(figure=fig),
         dcc.Dropdown(
-            
             placeholder="Name",
             id="name_info",
             options=[{'label':k,'value':k}for k in show_df['Name']]
         ),
         html.Div([
-            
-            
-            html.P("This dashboard is for prototype Purpose Only",
-                   
-                   style={'color':'white'}),
-            html.P("Due to lack of Cloud Storage Instant Changes will not be Reflected",
-                   
-                   style={'color':'white'})
+            html.P("This dashboard is for prototype Purpose Only", style={'color':'white'}),
+            html.P("Due to lack of Cloud Storage Instant Changes will not be Reflected", style={'color':'white'})
         ]),
-        
-        
         
         
         
@@ -279,10 +250,8 @@ app.layout = html.Div([
         'justifyContent':'center',
         'background-color':'#707F62',
         'flexDirection':'column'
-        
     }),
     html.Div(id="complete_detail"),
-    
 ])
 
 @app.callback(
@@ -322,10 +291,7 @@ def info(index):
              'justifyContent':'center',
              'alignItems':'center',
              'gap':'13px',
-             'background-color':"#e6e9be"
-             
-             
-             })
+             'background-color':"#e6e9be"})
 
 @app.callback(
     Output('skills_req','value'),
@@ -342,9 +308,6 @@ def admin_confirm(n,value):
     show_df = pd.read_csv("users.csv")
     soham_df3 = pd.read_csv('admin.csv')
     
-    
-    
-    
     show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
     show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
     show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
@@ -353,9 +316,6 @@ def admin_confirm(n,value):
     )
     show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
     fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
-    
-
-
 
 @app.callback(
     Output('op','children'),
@@ -375,8 +335,6 @@ def show(n, name, year, skills, collage, exp):
         
         show_df = pd.read_csv("users.csv")
         soham_df3 = pd.read_csv('admin.csv')
-        
-        
         
         show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
         show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
