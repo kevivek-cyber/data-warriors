@@ -495,4 +495,4 @@ def submit_quiz(n, quiz_data, candidate):
     return f"Quiz submitted. Score: {score}/{len(questions)}"
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    server.run(debug=False, host="0.0.0.0", port=8050)
