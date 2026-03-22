@@ -872,8 +872,4 @@ def submit_quiz(n, quiz_data, candidate):
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     app.run(debug=True)
-=======
-    app.run(debug=True)
->>>>>>> a2b83316d91e049260651c198a1692255456ab07
