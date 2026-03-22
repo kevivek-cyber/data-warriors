@@ -1,11 +1,10 @@
 import dash
-from dash import dcc, html, Input, Output, State, ALL
+from dash import dcc, html, Input, Output, State, ALL, dash_table
 import pandas as pd
 import os
 import plotly.express as px
 import numpy as np
 import plotly.graph_objects as go
-import dash_table 
 import re
 
 # nlp = spacy.load("en_core_web_sm")
@@ -36,6 +35,7 @@ import re
 
 
 app = dash.Dash(__name__)
+server = app.server
 
 file_path = "users.csv"
 admin_path = "admin.csv"
