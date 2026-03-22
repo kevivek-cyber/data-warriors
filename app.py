@@ -7,33 +7,6 @@ import numpy as np
 import plotly.graph_objects as go
 import re
 
-# nlp = spacy.load("en_core_web_sm")
-
-
-# def extract_details(text):
-#     doc = nlp(text)
-
-   
-#     name = ""
-#     for ent in doc.ents:
-#         if ent.label_ == "PERSON":
-#             name = ent.text
-#             break
-
-   
-#     if not name:
-#         lines = text.strip().split("\n")
-#         if lines:
-#             name = lines[0]
-            
-#     skill_keywords = [
-#         'python','java','cpp','c','javascript','typescript','react',
-#         'angular','vue','nodejs','django','flask','sql','pandas',
-#         'numpy','machine learning','data science','docker','aws','git'
-#     ]
-
-
-
 app = dash.Dash(__name__)
 server = app.server
 
@@ -43,21 +16,14 @@ admin_path = "admin.csv"
 
 def quiz_pie_chart(score):
     fig = go.Figure(go.Pie(
-        values=[score, 3-score],  # score vs remaining
+        values=[score, 3-score],
         labels=['Scored', 'Remaining'],
         hole=0.6,
         marker_colors=['#00cc96', '#e9ecef'],
         textinfo='none'
     ))
+    return fig
 
-    
-
-if not os.path.exists(file_path):
-    pd.DataFrame(columns=['Name','Passing Year','Aquired Skill','Enter Collage','Year of Experience','Quiz Score','Score','Projects']).to_csv(file_path, index=False)
-
-if not os.path.exists(admin_path):
-    pd.DataFrame(columns=['Required Skills']).to_csv(admin_path,index=False)
-    
 def admin_file(give_list):
     
     admin_df = pd.DataFrame({'Required Skills':[give_list]})
@@ -69,24 +35,13 @@ soham_df3 = pd.read_csv('admin.csv')
 show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
 show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
 show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
-show_df['matches'] = show_df['Aquired Skill'].apply(
-    lambda x: int(any(skill in soham_df3['required_skills'].values for skill in x))
-)
+show_df['matches'] = 0
 show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
 fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
-print(show_df)
-
-
-
-
 
 show_df.columns = show_df.columns.str.strip()
 
-
 show_df['Name'] = show_df['Name'].str.strip()
-
-
-
 
 jobs_skills = {
     "Software Developer": [
@@ -252,19 +207,15 @@ def generate_questions():
             )
         ]) for q in questions
     ]
-    
-
 
 fig.update_layout(
-    paper_bgcolor="#daab72",  # transparent figure background '#686a2a
-    plot_bgcolor="#e6e9be"    # transparent plot area
-    
+    paper_bgcolor="#daab72",
+    plot_bgcolor="#e6e9be"
 )
 
 
 
 app.layout = html.Div([
-    
     html.Div([
         dcc.Store(id="candidate_data", data={}),
         dcc.Store(id="quiz-store", data={}),
@@ -401,39 +352,14 @@ app.layout = html.Div([
         html.Div(id='updated_graph'),
         
         dcc.Dropdown(
-            
             placeholder="Name",
             id="name_info",
             options=[{'label':k,'value':k}for k in show_df['Name']]
         ),
-        # html.Div([
-        #     html.H2("Data Table"),
-        #     dash_table.DataTable(
-                
-                
-        #         data=show_table.to_dict('records'),
-        #         columns=[{'name':col,'id':col} for col in show_table.columns]
-                
-                
-                
-                
-        #     )
-            
-        # ]),
-        
-        
-                        
-        
-        
-        
         html.Div([
-            
-            
             html.P("This dashboard is for prototype Purpose Only",
-                   
                    style={'color':'white'}),
             html.P("Due to lack of Cloud Storage Instant Changes will not be Reflected",
-                   
                    style={'color':'white'})
         ]),
         
@@ -470,8 +396,7 @@ app.layout = html.Div([
 )
 def info(index):
     if not index:
-        return html.Div("Select a candidate to see details"),dash.no_update
-
+        return html.Div("Select a candidate to see details"), dash.no_update
     candidate = show_df[show_df['Name'] == index].iloc[0]
 
     score = candidate['Quiz Score']
@@ -484,9 +409,8 @@ def info(index):
         title=f"{candidate['Name']}'s Quiz Score out of 3"
     )
     fig3.update_layout(
-        paper_bgcolor="#e6e9be",  
-        plot_bgcolor="#e6e9be"    
-        
+        paper_bgcolor="#e6e9be",
+        plot_bgcolor="#e6e9be"
     )
 
     return html.Div([
@@ -503,37 +427,12 @@ def info(index):
              'gap':'13px',
              'background-color':"#e6e9be",
              'margin':'0px',
-             'padding':'0px',
-             
-             
-             }),html.Div([
+             'padding':'0px'}),html.Div([
                 html.H3(f"Candidate: {candidate['Name']}"),
-                 
              ],style={'display':'flex',
                        'justifyContent':'center',
                         'alignItems':'center',
-                        'background-color':"#e6e9be",
-                        
-                      
-                      })
-                   
-    
-    #     html.H4(row['Name']),
-    #     html.P(f"Passing Year: {row['Passing Year']}"),
-    #     html.P(f"Acquired Skill: {row['Acquired Skill']}"),
-    #     dcc.Graph(figure=quiz_pie_chart(row['Quiz Score'])),
-    #     html.P(f"Performance: {row['Performance']}")
-    # ], style={
-    #     'border': '1px solid #ccc',
-    #     'padding': '15px',
-    #     'margin': '10px',
-    #     'borderRadius': '10px',
-    #     'width': '200px',
-    #     'display': 'inline-block',
-    #     'textAlign': 'center',
-    #     'boxShadow': '2px 2px 5px #aaa'
-    # })
-    
+                        'background-color':"#e6e9be"})
 
 @app.callback(
     Output('job_matches_div','children'),
@@ -633,86 +532,26 @@ def admin_confirm(n,value):
     show_df = pd.read_csv("users.csv")
     soham_df3 = pd.read_csv('admin.csv')
     
-    print("-----------------checking how value looks ------------------->")
-    print(value)
     newval=(",".join(value))
-    print("---------------------------------------------------------------->")
-    print("---------------Value look in column------------------------>")
-    
-    soham_df = pd.DataFrame({'required_skills':[newval]})
-    print(soham_df)
-    print(soham_df['required_skills'])
-    print("-------------------Cheking how i can add col by trans--------------->")
-    show_df['try_333']=soham_df['required_skills']
-
-    val=soham_df.loc[0,'required_skills']
+    soham_df = pd.DataFrame({'Required Skills':[newval]})
+    show_df['try_333']=soham_df['Required Skills']
+    val=soham_df.loc[0,'Required Skills']
     show_df['try_333']=show_df['try_333'].fillna(val)
-
-    print("-----------------Cheking the matches ---------3------------------>")
-    
     show_df['new_matches']=np.sum(show_df['Aquired Skill'].any()==show_df['try_333'].any())
-    print(show_df.loc[[i for i in range(len(show_df['Aquired Skill']))],'Aquired Skill'].to_string())
-    print(show_df['Aquired Skill'].astype('string'))
-    # print(soham_df.loc[[i for i in range(len(soham_df['required_skills']))],'required_skills'][0])
-    print("---------------------------set logic ---------------------------->")
-
     show_df['Aquired Skill_set'] = show_df['Aquired Skill'].apply(lambda x: set(i.strip() for i in x.split(',')))
     show_df['try_333_set'] = show_df['try_333'].apply(lambda x: set(i.strip() for i in x.split(',')))
-
-   
     show_df['new_matches'] = show_df.apply(lambda x: x['try_333_set'].issubset(x['Aquired Skill_set']), axis=1)
-    print("---------------------------new_matches _____________>")
     show_df['new_matches'] = show_df.apply(lambda x: len(x['Aquired Skill_set'] & x['try_333_set']), axis=1)
-    print(show_df[['Aquired Skill', 'try_333', 'new_matches']])
-
-
-
-
-    print("---------------------------------------------------------------->")
-    
     soham_df.to_csv("admin.csv",index=False)
-    
-    
-    
-    
-    
-    
     show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
     show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
     show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
     show_df['matches'] = show_df['Aquired Skill'].apply(
-        lambda x: int(any(skill in soham_df3['required_skills'].values for skill in x))
+        lambda x: int(any(skill in soham_df3['Required Skills'].values if 'Required Skills' in soham_df3.columns else False for skill in x))
     )
-    print(show_df['matches'])
-    print(soham_df)
-    print("--------------------------------------->")
-    print(soham_df3['required_skills'])
-    print(show_df['Aquired Skill'])
-    
-    
-    
-    # show_df['new3']=soham_df3['required_skills'].transform()
-    print("-----------------------------------trying----------------------->")
-    print(show_df)
-    
-    
-    
     show_df['Performance'] = pd.to_numeric(show_df['new_matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
     fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
-    
-    return dcc.Graph(
-        figure=fig,
-        
-        
-    ), dash.no_update  
-    
-    
-    
-    
-    
-    
-
-
+    return dcc.Graph(figure=fig), dash.no_update
 
 @app.callback(
     Output('op','children'),
@@ -739,7 +578,7 @@ def show(n, name, year, skills, collage, exp):
         show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
         show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
         show_df['matches'] = show_df['Aquired Skill'].apply(
-            lambda x: int(any(skill in soham_df3['required_skills'].values for skill in x))
+            lambda x: int(any(skill in soham_df3['Required Skills'].values if 'Required Skills' in soham_df3.columns else False for skill in x))
         )
         show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
         fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
@@ -779,20 +618,14 @@ def show(n, name, year, skills, collage, exp):
 def store_answers(values):
     show_df = pd.read_csv("users.csv")
     soham_df3 = pd.read_csv('admin.csv')
-    
-    
-    
     show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
     show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
     show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
     show_df['matches'] = show_df['Aquired Skill'].apply(
-        lambda x: int(any(skill in soham_df3['required_skills'].values for skill in x))
+        lambda x: int(any(skill in soham_df3['Required Skills'].values if 'Required Skills' in soham_df3.columns else False for skill in x))
     )
     show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
     fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
-    
-    
-    
     data = {}
     for i, v in enumerate(values):
         data[questions[i]["id"]] = v
@@ -802,20 +635,14 @@ def calculate_score(data):
     score = 0
     show_df = pd.read_csv("users.csv")
     soham_df3 = pd.read_csv('admin.csv')
-    
-    
-        
     show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
     show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
     show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
     show_df['matches'] = show_df['Aquired Skill'].apply(
-        lambda x: int(any(skill in soham_df3['required_skills'].values for skill in x))
+        lambda x: int(any(skill in soham_df3['Required Skills'].values if 'Required Skills' in soham_df3.columns else False for skill in x))
     )
     show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
     fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
-    
-    
-    
     for q in questions:
         if data.get(q["id"]) == q["answer"]:
             score += 1
@@ -830,20 +657,14 @@ def calculate_score(data):
 def submit_quiz(n, quiz_data, candidate):
     show_df = pd.read_csv("users.csv")
     soham_df3 = pd.read_csv('admin.csv')
-    
-    
-    
     show_df['Year of Experience'] = pd.to_numeric(show_df['Year of Experience'], errors='coerce').fillna(0)
     show_df['Quiz Score'] = pd.to_numeric(show_df['Quiz Score'], errors='coerce').fillna(0)
     show_df['Year of Experience'] = show_df['Year of Experience'].sort_values(ascending=True)
     show_df['matches'] = show_df['Aquired Skill'].apply(
-        lambda x: int(any(skill in soham_df3['required_skills'].values for skill in x))
+        lambda x: int(any(skill in soham_df3['Required Skills'].values if 'Required Skills' in soham_df3.columns else False for skill in x))
     )
     show_df['Performance'] = pd.to_numeric(show_df['matches'], errors='coerce') + pd.to_numeric(show_df['Quiz Score'], errors='coerce') + pd.to_numeric(show_df['Year of Experience'], errors='coerce')
     fig = px.bar(show_df,x="Name",y='Performance',title="Candidate Dash")
-    
-    
-    
     if not n:
         return ""
 
